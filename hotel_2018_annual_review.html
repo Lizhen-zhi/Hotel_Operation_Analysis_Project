@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>酒店年度回顾 2018</title>
+<script src="chart.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #0a0e17;
+  display: flex; justify-content: center; align-items: center;
+  min-height: 100vh; padding: 20px;
+}
+.slide {
+  width: 1280px; min-height: 720px;
+  background: linear-gradient(135deg, #0f1724 0%, #1a1f2e 40%, #141824 100%);
+  border-radius: 16px; padding: 40px 50px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+  position: relative; overflow: hidden;
+}
+.slide::before {
+  content: ''; position: absolute;
+  top: -100px; right: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.slide::after {
+  content: ''; position: absolute;
+  bottom: -80px; left: -80px;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(180,160,120,0.06) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+/* Header */
+.header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 28px; position: relative; z-index: 1;
+}
+.title-group h1 {
+  font-size: 32px; font-weight: 200; color: #d4af37;
+  letter-spacing: 4px; text-transform: uppercase;
+}
+.title-group h2 {
+  font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.45);
+  margin-top: 4px; letter-spacing: 2px;
+}
+.year-badge {
+  font-size: 72px; font-weight: 100; color: rgba(212,175,55,0.15);
+  line-height: 1; letter-spacing: -2px;
+}
+
+/* KPI Cards */
+.kpi-row {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 14px; margin-bottom: 24px; position: relative; z-index: 1;
+}
+.kpi-card {
+  background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px; padding: 18px 20px;
+  transition: all 0.3s;
+}
+.kpi-card:hover {
+  background: rgba(212,175,55,0.05);
+  border-color: rgba(212,175,55,0.2);
+  transform: translateY(-2px);
+}
+.kpi-label {
+  font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.35);
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;
+}
+.kpi-value {
+  font-size: 28px; font-weight: 200; color: #fff;
+  letter-spacing: -0.5px;
+}
+.kpi-value.gold { color: #d4af37; }
+.kpi-sub {
+  font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 4px;
+}
+.kpi-sub .up { color: #d4af37; }
+.kpi-sub .warn { color: #e07050; }
+.kpi-sub .good { color: #5a9e6f; }
+
+/* Charts Row */
+.charts-row {
+  display: grid; grid-template-columns: 1.2fr 0.8fr 1fr;
+  gap: 16px; margin-bottom: 20px; position: relative; z-index: 1;
+}
+
+/* Chart Panel */
+.chart-panel {
+  background: linear-gradient(145deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.005) 100%);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px; padding: 18px; position: relative;
+}
+.chart-title {
+  font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.5);
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px;
+}
+.chart-wrap { position: relative; height: 200px; }
+.chart-wrap canvas { width: 100% !important; }
+
+/* Insights Panel */
+.insights-panel {
+  background: linear-gradient(145deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.005) 100%);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px; padding: 18px; position: relative; z-index: 1;
+}
+.insight-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.insight-item:last-child { border-bottom: none; }
+.insight-icon {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+.insight-icon.gold { background: rgba(212,175,55,0.12); color: #d4af37; }
+.insight-icon.blue { background: rgba(100,160,220,0.12); color: #6ca8e0; }
+.insight-icon.red { background: rgba(220,100,80,0.12); color: #e07050; }
+.insight-icon.green { background: rgba(90,158,111,0.12); color: #5a9e6f; }
+.insight-text { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.6; }
+.insight-text strong { color: rgba(255,255,255,0.8); font-weight: 500; }
+
+/* Footer */
+.footer {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 8px; padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  position: relative; z-index: 1;
+}
+.footer-text {
+  font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+<div class="slide">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="title-group">
+      <h1>Grand Horizon Hotel</h1>
+      <h2>年度运营回顾 · Annual Performance Review</h2>
+    </div>
+    <div class="year-badge">2018</div>
+  </div>
+
+  <!-- KPI Row -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">总收入 Revenue</div>
+      <div class="kpi-value gold">¥384K</div>
+      <div class="kpi-sub"><span class="up">↑291%</span> 同比增长</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">订单总量 Bookings</div>
+      <div class="kpi-value">2,000</div>
+      <div class="kpi-sub"><span class="up">↑383%</span> vs 2017 (343)</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">平均房价 ADR</div>
+      <div class="kpi-value gold">¥100</div>
+      <div class="kpi-sub"><span class="up">+¥13</span> 价格提升</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">取消率 Cancel Rate</div>
+      <div class="kpi-value" style="color:#e07050">34.4%</div>
+      <div class="kpi-sub"><span class="warn">⚠ 2017仅11.7%</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">客户过夜总晚数</div>
+      <div class="kpi-value">3,817</div>
+      <div class="kpi-sub">Avg 2.9晚/订单</div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-row">
+
+    <!-- Monthly Revenue & Bookings -->
+    <div class="chart-panel">
+      <div class="chart-title">月度收入与订单趋势</div>
+      <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
+    </div>
+
+    <!-- Market Segment -->
+    <div class="chart-panel">
+      <div class="chart-title">渠道分布</div>
+      <div class="chart-wrap"><canvas id="segmentChart"></canvas></div>
+    </div>
+
+    <!-- Room Type -->
+    <div class="chart-panel">
+      <div class="chart-title">房型 & 取消率</div>
+      <div class="chart-wrap"><canvas id="roomChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Insights -->
+  <div class="insights-panel">
+    <div class="chart-title">关键洞察 Key Insights</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+      <div class="insight-item">
+        <div class="insight-icon gold">📈</div>
+        <div class="insight-text"><strong>业务爆发式增长：</strong>2018年订单量同比激增383%，收入增长291%。线上渠道贡献65%订单，成为增长主引擎。</div>
+      </div>
+      <div class="insight-item">
+        <div class="insight-icon red">⚠</div>
+        <div class="insight-text"><strong>取消率恶化：</strong>取消率从11.7%飙升至34.4%，线上渠道高达38.6%。取消订单平均提前140天下单（成功订单仅54天），意味着远期的低价预订更易取消。</div>
+      </div>
+      <div class="insight-item">
+        <div class="insight-icon blue">🏖</div>
+        <div class="insight-text"><strong>夏秋双旺季：</strong>8-10月为订单高峰，12月以¥51K成为收入最高月（冬季假期效应）。7月取消率最高达55.1%，宜提前收取定金。</div>
+      </div>
+      <div class="insight-item">
+        <div class="insight-icon green">💡</div>
+        <div class="insight-text"><strong>运营建议：</strong>Room_Type_1占比77%，可适度提价；高阶房型(Room_Type_6, ¥180)预订少但均价高，考虑差异化营销。Corporate渠道取消率仅8.8%，优先维护企业客户。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span class="footer-text">数据周期：2017–2018  |  样本量：2,000 笔预订  |  数据口径：Grand Horizon Hotel 内部运营数据</span>
+    <span class="footer-text">Confidential</span>
+  </div>
+
+</div>
+
+<script>
+// -- Monthly Revenue & Bookings --
+const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const monthlyData = [
+  {bookings:56,revenue:10256},{bookings:87,revenue:13233},{bookings:146,revenue:29086},
+  {bookings:125,revenue:20766},{bookings:148,revenue:30263},{bookings:161,revenue:25979},
+  {bookings:147,revenue:24509},{bookings:222,revenue:49549},{bookings:254,revenue:49062},
+  {bookings:270,revenue:45062},{bookings:181,revenue:35251},{bookings:203,revenue:50950}
+];
+
+new Chart(document.getElementById('monthlyChart'), {
+  type: 'bar',
+  data: {
+    labels: months,
+    datasets: [{
+      label: '收入 (¥)',
+      data: monthlyData.map(d => d.revenue),
+      backgroundColor: 'rgba(212,175,55,0.35)',
+      borderColor: 'rgba(212,175,55,0.7)',
+      borderWidth: 1,
+      borderRadius: 4,
+      order: 2,
+      yAxisID: 'y'
+    }, {
+      label: '订单量',
+      data: monthlyData.map(d => d.bookings),
+      type: 'line',
+      borderColor: 'rgba(108,168,224,0.7)',
+      backgroundColor: 'rgba(108,168,224,0.08)',
+      borderWidth: 2,
+      fill: true,
+      tension: 0.4,
+      pointRadius: 3,
+      pointBackgroundColor: '#6ca8e0',
+      order: 1,
+      yAxisID: 'y1'
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        position: 'top', align: 'end',
+        labels: { boxWidth: 10, boxHeight: 10, padding: 16, color: 'rgba(255,255,255,0.4)', font: { size: 10 }, usePointStyle: true }
+      }
+    },
+    scales: {
+      x: { ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
+      y: {
+        type: 'linear', position: 'left',
+        title: { display: true, text: '收入 ¥', color: 'rgba(212,175,55,0.5)', font: { size: 10 } },
+        ticks: { color: 'rgba(212,175,55,0.4)', font: { size: 9 }, callback: v => '¥' + (v/1000).toFixed(0) + 'K' },
+        grid: { color: 'rgba(255,255,255,0.03)' }
+      },
+      y1: {
+        type: 'linear', position: 'right',
+        title: { display: true, text: '订单量', color: 'rgba(108,168,224,0.5)', font: { size: 10 } },
+        ticks: { color: 'rgba(108,168,224,0.4)', font: { size: 9 } },
+        grid: { display: false }
+      }
+    }
+  }
+});
+
+// -- Market Segment --
+new Chart(document.getElementById('segmentChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Online','Offline','Corporate','Complementary','Aviation'],
+    datasets: [{
+      data: [1295, 563, 113, 22, 7],
+      backgroundColor: [
+        'rgba(212,175,55,0.6)',
+        'rgba(180,160,120,0.5)',
+        'rgba(100,140,180,0.5)',
+        'rgba(120,160,140,0.4)',
+        'rgba(160,120,100,0.4)'
+      ],
+      borderColor: 'rgba(20,24,36,0.8)',
+      borderWidth: 2,
+      hoverBorderColor: 'rgba(212,175,55,0.5)'
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { padding: 12, color: 'rgba(255,255,255,0.4)', font: { size: 10 }, usePointStyle: true, pointStyleWidth: 8 }
+      }
+    }
+  }
+});
+
+// -- Room Type w/ Cancel Rate --
+const roomLabels = ['Room_Type 1','Room_Type 4','Room_Type 6','Room_Type 2','Room_Type 5','Room_Type 7'];
+const roomBookings = [1546, 349, 53, 28, 19, 5];
+const roomCancel = [34.5, 33.5, 45.3, 32.1, 21.1, 20.0];
+const roomPrice = [96, 126, 180, 96, 121, 125];
+
+new Chart(document.getElementById('roomChart'), {
+  type: 'bar',
+  data: {
+    labels: roomLabels,
+    datasets: [{
+      label: '预订量',
+      data: roomBookings,
+      backgroundColor: 'rgba(212,175,55,0.3)',
+      borderColor: 'rgba(212,175,55,0.5)',
+      borderWidth: 1, borderRadius: 4,
+      yAxisID: 'y'
+    }, {
+      label: '取消率 %',
+      data: roomCancel,
+      type: 'line',
+      borderColor: '#e07050',
+      backgroundColor: 'rgba(224,112,80,0.05)',
+      borderWidth: 2, fill: false, tension: 0.3,
+      pointRadius: 4, pointBackgroundColor: '#e07050',
+      yAxisID: 'y1'
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top', align: 'end',
+        labels: { boxWidth: 10, boxHeight: 10, padding: 16, color: 'rgba(255,255,255,0.4)', font: { size: 10 }, usePointStyle: true }
+      }
+    },
+    scales: {
+      x: { ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 9 } }, grid: { display: false } },
+      y: {
+        type: 'linear', position: 'left',
+        ticks: { color: 'rgba(212,175,55,0.4)', font: { size: 9 } },
+        grid: { color: 'rgba(255,255,255,0.03)' }
+      },
+      y1: {
+        type: 'linear', position: 'right',
+        min: 0, max: 60,
+        ticks: { color: 'rgba(224,112,80,0.4)', font: { size: 9 }, callback: v => v + '%' },
+        grid: { display: false }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
