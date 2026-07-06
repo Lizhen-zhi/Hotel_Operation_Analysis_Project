@@ -5,10 +5,12 @@
 并同步输出 **Power BI 仪表盘** 和 **AI 辅助生成的 H5 交互看板**。
 
 ## 仓库结构
+
+```
 ├── Hotel dataset.xlsx                    # 【核心】原始数据 + Excel 分析（函数建模/图表）
 ├── Hotel Report.pbix                     # Power BI 经营分析仪表盘（手动搭建）
 └── hotel_2018_annual_review.html         # AI 辅助生成的 H5 交互看板（ECharts）
-
+```
 ## 分析内容
 
 所有分析均在 Excel 中完成，包括：
