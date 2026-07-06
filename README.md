@@ -6,9 +6,7 @@
 
 ## 仓库结构
 ├── Hotel dataset.xlsx                    # 【核心】原始数据 + Excel 分析（函数建模/图表）
-
 ├── Hotel Report.pbix                     # Power BI 经营分析仪表盘（手动搭建）
-
 └── hotel_2018_annual_review.html         # AI 辅助生成的 H5 交互看板（ECharts）
 
 ## 分析内容
@@ -24,7 +22,7 @@
 
 - **分析工具**：Excel（函数公式 / 条件计算 / 图表）
 - **可视化**：Power BI（.pbix）、HTML + ECharts（H5）
-- **AI 辅助**：Work Buddy（仅用于 H5 页面代码生成）
+- **AI 辅助**：WorkBuddy（仅用于 H5 页面代码生成）
 
 ## 快速查看
 
